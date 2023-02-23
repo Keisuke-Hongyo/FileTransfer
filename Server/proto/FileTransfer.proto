@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "FileTransfer/Server/proto";
+
+package fileTransfer;
+
+// The greeting service definition.
+service FileTransfer {
+  // Sends a greeting
+  rpc UploadFile (stream UploadFileStruct) returns (UploadResponse) {}
+}
+
+message UploadFileStruct {
+  string filename = 1;
+  int32 size = 2;
+  bytes  filedata = 3;
+
+}
+
+// The response message containing the greetings
+message UploadResponse {
+  bool result = 1;
+}
