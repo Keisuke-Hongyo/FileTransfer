@@ -10,12 +10,23 @@ service FileTransfer {
   rpc UploadFile (stream UploadFileStruct) returns (UploadResponse) {}
 }
 
-message UploadFileStruct {
-  string filename = 1;
-  int32 size = 2;
-  bytes  filedata = 3;
 
+message UploadFileStruct {
+  oneof file{
+    FileMeta meta = 1;
+    FileData data = 2;
+  }
+
+  message FileMeta{
+    string filename = 1;
+  }
+  message FileData{
+    int32 size = 1;
+    bytes binarydata = 2;
+  }
 }
+
+
 
 // The response message containing the greetings
 message UploadResponse {

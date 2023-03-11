@@ -2,16 +2,12 @@ package main
 
 import (
 	pb "FileTrasfer/Server/proto"
-	"fmt"
 	"google.golang.org/grpc"
 	"io"
 	"log"
 	"net"
 	"os"
 )
-
-// Buffer バッファサイズ -> 1Mbyte
-const Buffer = 1024 * 1024
 
 type uploadServer struct {
 	pb.UnsafeFileTransferServer
@@ -20,15 +16,13 @@ type uploadServer struct {
 func (u uploadServer) UploadFile(stream pb.FileTransfer_UploadFileServer) error {
 
 	first, _ := stream.Recv()
-	wrtfile, err := os.Create(first.Filename)
+	meta := first.GetMeta()
+	wrtfile, err := os.Create(meta.Filename)
 	if err != nil {
 		return err
 	}
 
 	defer wrtfile.Close()
-
-	wrtfile.Write(first.Filedata[0:first.Size])
-	fmt.Printf("Size:%d\n", first.Size)
 
 	for {
 		s, err := stream.Recv()
@@ -40,8 +34,8 @@ func (u uploadServer) UploadFile(stream pb.FileTransfer_UploadFileServer) error 
 		if err != nil {
 			return err
 		}
-		wrtfile.Write(s.Filedata[0:s.Size])
-		fmt.Printf("Size:%d\n", s.Size)
+		wrtfile.Write(s.GetData().Binarydata[0:s.GetData().Size])
+
 	}
 
 	// 終了処理
